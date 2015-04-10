@@ -60,13 +60,25 @@ class CorkMeshSlicerOperator(bpy.types.Operator):
             options={'HIDDEN', 'SKIP_SAVE'},
             )
 
+    _commands = {
+            'UNION':'-union',
+            'DIFF':'-diff',
+            'INTERSECT':'-isct',
+            'XOR':'-xor',
+            'RESOLVE':'-resolve',
+            }
+
     @classmethod
     def poll(cls, context):
         return context.active_object and context.active_object.select
 
     def exec(self, context):
-        print(self.method, self._base, self._plane)
-        slice_out(self._cork)
+        try:
+            slice_out(context, self._cork, self._method, self._base, self._plane)
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
+
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -90,7 +102,8 @@ class CorkMeshSlicerOperator(bpy.types.Operator):
 
         self._cork = cork
         self._plane = context.active_object
-        self._base = context.selected_objects[0] if context.selected_objects[0] != self._base else context.selected_objects[1]
+        self._base = context.selected_objects[0] if context.selected_objects[0] != self._plane else context.selected_objects[1]
+        self._method = self._commands.get(self.method)
 
         return self.exec(context)
 

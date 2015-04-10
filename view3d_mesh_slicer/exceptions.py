@@ -29,3 +29,13 @@ class NonMeshSelectedException(Exception):
         self._object = obj
     def __str__(self):
       return "Selected object \"{0}\" is not a mesh".format(self._object.name)
+
+
+class ExportMeshException(Exception):
+    def __init__(self, obj, filepath):
+        Exception.__init__(self)
+        self._object = obj
+        self._filepath = filepath
+    def __str__(self):
+      return "Failed to export object \"{0}\" to \"{1}\"".format(self._object.name, self._filepath)
+
