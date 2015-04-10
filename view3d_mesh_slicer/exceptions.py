@@ -39,3 +39,10 @@ class ExportMeshException(Exception):
     def __str__(self):
       return "Failed to export object \"{0}\" to \"{1}\"".format(self._object.name, self._filepath)
 
+
+class ImportMeshException(Exception):
+    def __init__(self, filepath):
+        Exception.__init__(self)
+        self._filepath = filepath
+    def __str__(self):
+      return "Failed to import mesh \"{0}\"".format(self._filepath)
