@@ -1,4 +1,7 @@
 import bpy
+from bpy.props import (
+        EnumProperty,
+        )
 
 from .exceptions import *
 
@@ -21,8 +24,15 @@ class CorkMeshSlicerPanel(bpy.types.Panel):
     @staticmethod
     def draw(self, context):
         layout = self.layout
-        layout.label(text="1,2,3")
-        layout.operator('view3d.cork_mesh_slicer')
+
+        col = layout.column()
+        col.operator("view3d.cork_mesh_slicer", text="Union").method="UNION"
+        col.operator("view3d.cork_mesh_slicer", text="Difference").method="DIFF"
+        col.operator("view3d.cork_mesh_slicer", text="Intersect").method="INTERSECT"
+        col.operator("view3d.cork_mesh_slicer", text="XOR").method="XOR"
+        col.operator("view3d.cork_mesh_slicer", text="Resolve").method="RESOLVE"
+        col.separator()
+        col.operator("view3d.cork_mesh_slicer", text="", icon='QUESTION', emboss=False).show_help = True
 
 
 class CorkMeshSlicerOperator(bpy.types.Operator):
@@ -31,22 +41,96 @@ class CorkMeshSlicerOperator(bpy.types.Operator):
     bl_label = "Mesh Slicer"
     bl_description = ""
 
+    method = EnumProperty(
+        description="",
+        items=(("UNION", "Union", "A + B"),
+               ("DIFF", "Difference", "A - B"),
+               ("INTERSECT", "Intersection", "A n B"),
+               ("XOR", "XOR", "A xor B"),
+               ("RESOLVE", "Resolve", "Intersect and connect"),
+               ),
+        default="DIFF",
+        options={'SKIP_SAVE'},
+        )
+
+    show_help = bpy.props.BoolProperty(
+            name="Help",
+            description="",
+            default=False,
+            options={'HIDDEN', 'SKIP_SAVE'},
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object and context.active_object.select
+
     def exec(self, context):
-        self.report({'INFO'}, "So far so good")
-        slice_out()
+        print(self.method, self._base, self._plane)
+        slice_out(self._cork)
         return {'FINISHED'}
 
     def invoke(self, context, event):
+        if self.show_help:
+            context.window_manager.popup_menu(self.help_draw, title='Help', icon='QUESTION')
+            return {'CANCELLED'}
+
         cork = get_cork_filepath(context)
 
         try:
             validate_executable(cork)
-
         except Exception as e:
             self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
 
+        try:
+            self.check_errors(context.selected_objects, self.method)
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
+
+        self._cork = cork
+        self._plane = context.active_object
+        self._base = context.selected_objects[0] if context.selected_objects[0] != self._base else context.selected_objects[1]
+
         return self.exec(context)
+
+    def check_errors(self, objects, method):
+        """"""
+        if len(objects) != 2:
+            raise NumberSelectionException
+
+        for obj in objects:
+            if obj.type != 'MESH':
+                raise NonMeshSelectedException(obj)
+
+
+    def help_draw(self, _self, context):
+        layout = _self.layout
+        col = layout.column()
+
+        col.label(text="This operator works from the selected to the active objects")
+        col.label(text="The active must be a single plane")
+
+        col.separator()
+        col.label(text="Union")
+        col.label(text="Compute the Boolean union of in0 and in1, and output the result")
+
+        col.separator()
+        col.label(text="Difference")
+        col.label(text="Compute the Boolean difference of in0 and in1, and output the result")
+
+        col.separator()
+        col.label(text="Intersect")
+        col.label(text="Compute the Boolean intersection of in0 and in1, and output the result")
+
+        col.separator()
+        col.label(text="XOR")
+        col.label(text="Compute the Boolean XOR of in0 and in1, and output the result")
+
+        col.separator()
+        col.label(text="Resolve")
+        col.label(text="Intersect the two meshes in0 and in1, and output the connected mesh with those")
+        col.label(text="intersections made explicit and connected")
 
 
 def register():

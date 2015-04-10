@@ -1,3 +1,3 @@
 
-def slice_out():
+def slice_out(cork):
     pass
