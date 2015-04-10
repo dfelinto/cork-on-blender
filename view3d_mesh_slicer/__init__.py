@@ -40,11 +40,19 @@ from . import init
 class CorkMeshSlicerPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    use_libraries = StringProperty(
+    cork_filepath = StringProperty(
         name="Cork Executable",
         description="Location of cork binary file",
+        subtype="FILE_PATH",
         default="",
         )
+
+    def draw(self, context):
+        layout = self.layout
+
+        row = layout.row()
+        row.prop(self, "cork_filepath")
+
 
 def register():
     bpy.utils.register_class(CorkMeshSlicerPreferences)
