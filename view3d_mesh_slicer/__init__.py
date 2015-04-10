@@ -31,33 +31,29 @@ bl_info = {
 
 
 import bpy
-class CorkMeshSlicerPanel(bpy.types.Panel):
-    bl_label = "Cork Mesh Slice"
-    bl_region_type = 'TOOLS'
+from bpy.props import StringProperty
 
-    @staticmethod
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="1,2,3")
-        layout.operator('view3d.cork_mesh_slicer')
-
-class CorkMeshSlicerOperator(bpy.types.Operator):
-    """"""
-    bl_idname = "view3d.cork_mesh_slicer"
-    bl_label = "Cork Mesh Slicer"
-    bl_description = ""
-
-    def exec(self, context):
-        return {'FINISHED'}
+from . import init
 
 
+# Preferences
+class CorkMeshSlicerPreferences(bpy.types.AddonPreferences):
+    bl_idname = __name__
+
+    use_libraries = StringProperty(
+        name="Cork Executable",
+        description="Location of cork binary file",
+        default="",
+        )
 
 def register():
-    bpy.utils.register_module(__name__)
+    bpy.utils.register_class(CorkMeshSlicerPreferences)
+    init.register()
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    bpy.utils.unregister_class(CorkMeshSlicerPreferences)
+    init.unregister()
 
 
 if __name__ == '__main__':
