@@ -152,5 +152,5 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(CorkMeshSlicerPanel)
     bpy.utils.unregister_class(CorkMeshSlicerOperator)
+    bpy.utils.unregister_class(CorkMeshSlicerPanel)
