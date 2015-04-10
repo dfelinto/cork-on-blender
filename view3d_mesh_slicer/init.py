@@ -1,5 +1,16 @@
 import bpy
 
+from .exceptions import *
+
+from .lib import (
+        get_cork_filepath,
+        validate_executable,
+        )
+
+from .core import (
+        slice_out,
+        )
+
 
 class CorkMeshSlicerPanel(bpy.types.Panel):
     bl_label = "Cork Mesh Slice"
@@ -21,9 +32,20 @@ class CorkMeshSlicerOperator(bpy.types.Operator):
     bl_description = ""
 
     def exec(self, context):
+        self.report({'INFO'}, "So far so good")
+        slice_out()
         return {'FINISHED'}
 
     def invoke(self, context, event):
+        cork = get_cork_filepath(context)
+
+        try:
+            validate_executable(cork)
+
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
+
         return self.exec(context)
 
 
