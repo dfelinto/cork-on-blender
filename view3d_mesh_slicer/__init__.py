@@ -20,7 +20,7 @@
 bl_info = {
     "name": "Cork Mesh Slicer",
     "author": "Dalai Felinto",
-    "version": (0, 9),
+    "version": (1, 0),
     "blender": (2, 7, 5),
     "location": "Tool Shelf",
     "description": "",
