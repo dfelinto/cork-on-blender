@@ -2,6 +2,29 @@ import bpy
 
 from .exceptions import *
 
+
+def has_triangulate_modifier(ob):
+    """if there is an existent modifier, that's all we need"""
+    for modifier in ob.modifiers:
+        if modifier.type == 'TRIANGULATE' and \
+           modifier.show_render:
+               return True
+
+
+def create_triangulate_modifier(ob):
+    """if there is no triangulate modifier creates a new one"""
+    if not has_triangulate_modifier(ob):
+        return ob.modifiers.new('Cork Triangulation', 'TRIANGULATE')
+    else:
+        return None
+
+
+def delete_triangulate_modifier(ob, modifier):
+    """remove previously created modifier"""
+    if modifier:
+        ob.modifiers.remove(modifier)
+
+
 def slice_out(context, cork, method, base, plane):
     import subprocess
 
@@ -16,7 +39,9 @@ def slice_out(context, cork, method, base, plane):
     print("Exporting file \"{0}\"".format(filepath_base))
     scene.objects.active = base
     if bpy.ops.export_mesh.off.poll():
+        modifier = create_triangulate_modifier(base)
         bpy.ops.export_mesh.off(filepath=filepath_base)
+        delete_triangulate_modifier(base, modifier)
     else:
         scene.objects.active = active
         raise ExportMeshException(base, filepath_base)
@@ -25,7 +50,9 @@ def slice_out(context, cork, method, base, plane):
     print("Exporting file \"{0}\"".format(filepath_plane))
     scene.objects.active = plane
     if bpy.ops.export_mesh.off.poll():
+        modifier = create_triangulate_modifier(plane)
         bpy.ops.export_mesh.off(filepath=filepath_plane)
+        delete_triangulate_modifier(plane, modifier)
     else:
         scene.objects.active = active
         raise ExportMeshException(plane, filepath_plane)
