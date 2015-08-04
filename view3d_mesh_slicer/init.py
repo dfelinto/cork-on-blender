@@ -10,10 +10,14 @@ from .lib import (
         validate_executable,
         )
 
-from .core import (
+from .cork import (
         slice_out,
         )
 
+
+# ############################################################
+# User Interface
+# ############################################################
 
 class CorkMeshSlicerPanel(bpy.types.Panel):
     bl_label = "Cork Mesh Slice"
@@ -34,6 +38,10 @@ class CorkMeshSlicerPanel(bpy.types.Panel):
         col.separator()
         col.operator("view3d.cork_mesh_slicer", text="", icon='QUESTION', emboss=False).show_help = True
 
+
+# ############################################################
+# Operators
+# ############################################################
 
 class CorkMeshSlicerOperator(bpy.types.Operator):
     """"""
