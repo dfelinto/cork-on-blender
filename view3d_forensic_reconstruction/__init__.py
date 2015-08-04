@@ -20,7 +20,7 @@
 bl_info = {
     "name": "Forensic Facial Reconstruction",
     "author": "Dalai Felinto and Cícero Moraes",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 7, 5),
     "location": "Tool Shelf",
     "description": "",
