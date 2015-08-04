@@ -18,8 +18,8 @@
 
 # <pep8 compliant>
 bl_info = {
-    "name": "Cork Mesh Slicer",
-    "author": "Dalai Felinto",
+    "name": "Forensic Facial Reconstruction",
+    "author": "Dalai Felinto and Cícero Moraes",
     "version": (1, 0),
     "blender": (2, 7, 5),
     "location": "Tool Shelf",

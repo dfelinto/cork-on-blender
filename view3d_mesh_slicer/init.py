@@ -1,6 +1,17 @@
 import bpy
 from bpy.props import (
         EnumProperty,
+        FloatProperty,
+        StringProperty,
+        )
+
+from bpy.types import (
+        Operator,
+        Panel,
+        )
+
+from bpy_extras.io_utils import (
+        ImportHelper,
         )
 
 from .exceptions import *
@@ -14,16 +25,34 @@ from .cork import (
         slice_out,
         )
 
+from .skull import (
+        skull_import,
+        )
+
 
 # ############################################################
 # User Interface
 # ############################################################
 
-class CorkMeshSlicerPanel(bpy.types.Panel):
+class SkulImportPanel(Panel):
+    bl_label = "Skull Import"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'TOOLS'
+    bl_category = 'Forensic Reconstruction'
+
+    @staticmethod
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        col.operator("view3d.skull_import", text="Import", icon="FILE_FOLDER")
+
+
+class CorkMeshSlicerPanel(Panel):
     bl_label = "Cork Mesh Slice"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    bl_category = 'Osteotomia'
+    bl_category = 'Forensic Reconstruction'
 
     @staticmethod
     def draw(self, context):
@@ -43,7 +72,42 @@ class CorkMeshSlicerPanel(bpy.types.Panel):
 # Operators
 # ############################################################
 
-class CorkMeshSlicerOperator(bpy.types.Operator):
+class SkullImportOperator(Operator, ImportHelper):
+    """"""
+    bl_idname = "view3d.skull_import"
+    bl_label = "Skull Importer"
+    bl_description = ""
+
+    filename_ext = ".stl"
+
+    filter_glob = StringProperty(
+        default="*.stl",
+        options={'HIDDEN'},
+        )
+
+    decimate_factor = FloatProperty(
+            name="Decimator Factor",
+            default=0.35,
+            min=0.0,
+            max=1.0,
+            description="Simplify the mesh by this factor (1.0 = original mesh)",
+            )
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        try:
+            skull_import(context, self.properties.filepath, self.decimate_factor)
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
+
+        return {'FINISHED'}
+
+
+class CorkMeshSlicerOperator(Operator):
     """"""
     bl_idname = "view3d.cork_mesh_slicer"
     bl_label = "Mesh Slicer"
@@ -154,11 +218,23 @@ class CorkMeshSlicerOperator(bpy.types.Operator):
         col.label(text="intersections made explicit and connected")
 
 
+# ############################################################
+# Registration
+# ############################################################
+
 def register():
+    # the order here determines the UI order
+    bpy.utils.register_class(SkulImportPanel)
     bpy.utils.register_class(CorkMeshSlicerPanel)
+
     bpy.utils.register_class(CorkMeshSlicerOperator)
+    bpy.utils.register_class(SkullImportOperator)
 
 
 def unregister():
-    bpy.utils.unregister_class(CorkMeshSlicerOperator)
+    bpy.utils.unregister_class(SkulImportPanel)
     bpy.utils.unregister_class(CorkMeshSlicerPanel)
+    bpy.utils.unregister_class(SkulImportOperator)
+    bpy.utils.unregister_class(CorkMeshSlicerOperator)
+
+

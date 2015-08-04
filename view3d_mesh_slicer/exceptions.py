@@ -1,5 +1,9 @@
 # exceptions
 
+# ############################################################
+# Cork
+# ############################################################
+
 class InvalidPathException(Exception):
     def __init__(self, filepath):
         Exception.__init__(self)
@@ -46,3 +50,44 @@ class ImportMeshException(Exception):
         self._filepath = filepath
     def __str__(self):
       return "Failed to import mesh \"{0}\"".format(self._filepath)
+
+
+class ImportOffsetException(Exception):
+    def __init__(self):
+        Exception.__init__(self)
+    def __str__(self):
+        return "OFF importer not found. Enable the addon in Blender User Preferences"
+
+
+# ############################################################
+# Skull Import
+# ############################################################
+
+class ImportSTLException(Exception):
+    def __init__(self):
+        Exception.__init__(self)
+    def __str__(self):
+        return "STL importer not found. Enable the addon in Blender User Preferences"
+
+
+class ImportSkullException(Exception):
+    def __init__(self):
+        Exception.__init__(self)
+    def __str__(self):
+        return "Failed to import skull"
+
+
+class ImportSkullDecimateException(Exception):
+    def __init__(self):
+        Exception.__init__(self)
+    def __str__(self, object_name):
+        return "Failed to simplify object \"{0}\", apply the \"Decimate\" modifier manually".format(object_name)
+
+
+class ImportSkullViewAllException(Exception):
+    def __init__(self):
+        Exception.__init__(self)
+    def __str__(self):
+        return "Failed to zoom out to newly import object"
+
+

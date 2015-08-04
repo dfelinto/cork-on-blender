@@ -35,6 +35,11 @@ def slice_out(context, cork, method, base, plane):
     filepath_plane = '/tmp/plane.off'
     filepath_result = '/tmp/result.off'
 
+    try:
+        bpy.ops.import_mesh.off.poll()
+    except AttributeError:
+        raise ImportOffsetException()
+
     # export base
     print("Exporting file \"{0}\"".format(filepath_base))
     scene.objects.active = base
