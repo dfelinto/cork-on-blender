@@ -34,8 +34,8 @@ from .skull import (
 # User Interface
 # ############################################################
 
-class SkulImportPanel(Panel):
-    bl_label = "Skull Import"
+class AcquireDataPanel(Panel):
+    bl_label = "Acquire Data"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Forensic Reconstruction'
@@ -45,7 +45,7 @@ class SkulImportPanel(Panel):
         layout = self.layout
 
         col = layout.column()
-        col.operator("view3d.skull_import", text="Import", icon="FILE_FOLDER")
+        col.operator("view3d.skull_import", icon="FILE_FOLDER")
 
 
 class CorkMeshSlicerPanel(Panel):
@@ -224,7 +224,7 @@ class CorkMeshSlicerOperator(Operator):
 
 def register():
     # the order here determines the UI order
-    bpy.utils.register_class(SkulImportPanel)
+    bpy.utils.register_class(AcquireDataPanel)
     bpy.utils.register_class(CorkMeshSlicerPanel)
 
     bpy.utils.register_class(CorkMeshSlicerOperator)
@@ -232,8 +232,9 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(SkulImportPanel)
+    bpy.utils.unregister_class(AcquireDataPanel)
     bpy.utils.unregister_class(CorkMeshSlicerPanel)
+
     bpy.utils.unregister_class(SkulImportOperator)
     bpy.utils.unregister_class(CorkMeshSlicerOperator)
 
