@@ -91,6 +91,7 @@ class SkullImportOperator(Operator, ImportHelper):
             min=0.0,
             max=1.0,
             description="Simplify the mesh by this factor (1.0 = original mesh)",
+            options={'SKIP_SAVE'},
             )
 
     @classmethod
