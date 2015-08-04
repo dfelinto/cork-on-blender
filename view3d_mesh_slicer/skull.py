@@ -26,4 +26,12 @@ def skull_import(context, filepath, decimate_factor):
     if res != {'FINISHED'}:
         raise ImportSkullDecimateException(skull.name)
 
+    # expand the view to the new object
+    res = {'CANCELLED'}
+    if bpy.ops.view3d.view_all.poll():
+        res = bpy.ops.view3d.view_all()
+
+    if res != {'FINISHED'}:
+        raise ImportSkullViewAllException()
+
 
