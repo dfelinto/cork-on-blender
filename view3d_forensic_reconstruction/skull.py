@@ -14,17 +14,18 @@ def skull_import(context, filepath, decimate_factor):
     if res != {'FINISHED'}:
         raise ImportSkullException()
 
-    skull = context.object
-    decimate = skull.modifiers.new('Decimate', type='DECIMATE')
-    decimate.ratio = decimate_factor
+    if decimate_factor < 1.0:
+        skull = context.object
+        decimate = skull.modifiers.new('Decimate', type='DECIMATE')
+        decimate.ratio = decimate_factor
 
-    # apply the modifier
-    res = {'CANCELLED'}
-    if bpy.ops.object.modifier_apply.poll():
-        res = bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Decimate')
+        # apply the modifier
+        res = {'CANCELLED'}
+        if bpy.ops.object.modifier_apply.poll():
+            res = bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Decimate')
 
-    if res != {'FINISHED'}:
-        raise ImportSkullDecimateException(skull.name)
+        if res != {'FINISHED'}:
+            raise ImportSkullDecimateException(skull.name)
 
     # expand the view to the new object
     res = {'CANCELLED'}
