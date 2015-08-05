@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import (
+        BoolProperty,
         EnumProperty,
         FloatProperty,
         StringProperty,
@@ -94,13 +95,26 @@ class SkullImportOperator(Operator, ImportHelper):
             options={'SKIP_SAVE'},
             )
 
+    apply_modifier = BoolProperty(
+            name="Apply Decimate Modifier",
+            default=True,
+            description="",
+            options={'SKIP_SAVE'},
+            )
+
     @classmethod
     def poll(cls, context):
         return True
 
     def execute(self, context):
         try:
-            skull_import(context, self.properties.filepath, self.decimate_factor)
+            skull_import(
+                    context,
+                    self.properties.filepath,
+                    self.decimate_factor,
+                    self.apply_modifier,
+                    )
+
         except Exception as e:
             self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
