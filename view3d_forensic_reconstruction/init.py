@@ -67,7 +67,7 @@ class NaturalOrientationPanel(Panel):
         layout = self.layout
 
         col = layout.column()
-        col.operator("view3d.natural_orientation")
+        col.operator("view3d.natural_orientation", icon="MANIPUL")
 
 
 class CorkMeshSlicerPanel(Panel):
@@ -148,14 +148,14 @@ class NaturalOrientationOperator(Operator):
     bl_idname = "view3d.natural_orientation"
     bl_label = "Natural Orientation"
     bl_description = ""
+    bl_options = {'REGISTER', 'UNDO'}
 
     width = FloatProperty(
             name="Width",
             subtype='DISTANCE',
             description="",
             default=0.30,
-            min=0.0,
-            max=1.0,
+            min=0.001,
             )
 
     height = FloatProperty(
@@ -163,8 +163,7 @@ class NaturalOrientationOperator(Operator):
             subtype='DISTANCE',
             description="",
             default=0.50,
-            min=0.0,
-            max=1.0,
+            min=0.001,
             )
 
     @classmethod
@@ -177,7 +176,7 @@ class NaturalOrientationOperator(Operator):
         else:
             return False
 
-    def exec(self, context):
+    def execute(self, context):
         try:
             error_scale,  \
             error_angle = \
@@ -198,7 +197,7 @@ class NaturalOrientationOperator(Operator):
     def invoke(self, context, event):
         mesh = context.active_object.data
         bm = bmesh.from_edit_mesh(mesh)
-        selected_verts = [v for v in bm.verts if v.select]
+        selected_verts = [v.co for v in bm.verts if v.select]
 
         _len = len(selected_verts)
 
@@ -207,7 +206,6 @@ class NaturalOrientationOperator(Operator):
             return {'CANCELLED'}
 
         self._selected_verts = selected_verts
-        return self.exec(context) # TODO
 
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=150)
@@ -336,22 +334,20 @@ class CorkMeshSlicerOperator(Operator):
 
 def register():
     # the order here determines the UI order
-    bpy.utils.register_class(AcquireDataPanel)
-    bpy.utils.register_class(NaturalOrientationPanel)
-    bpy.utils.register_class(CorkMeshSlicerPanel)
-
     bpy.utils.register_class(SkullImportOperator)
     bpy.utils.register_class(NaturalOrientationOperator)
     bpy.utils.register_class(CorkMeshSlicerOperator)
 
+    bpy.utils.register_class(AcquireDataPanel)
+    bpy.utils.register_class(NaturalOrientationPanel)
+    bpy.utils.register_class(CorkMeshSlicerPanel)
+
 
 def unregister():
-    bpy.utils.unregister_class(AcquireDataPanel)
-    bpy.utils.unregister_class(NaturalOrientationPanel)
     bpy.utils.unregister_class(CorkMeshSlicerPanel)
+    bpy.utils.unregister_class(NaturalOrientationPanel)
+    bpy.utils.unregister_class(AcquireDataPanel)
 
-    bpy.utils.unregister_class(SkulImportOperator)
-    bpy.utils.unregister_class(NaturalOrientationOperator)
     bpy.utils.unregister_class(CorkMeshSlicerOperator)
-
-
+    bpy.utils.unregister_class(NaturalOrientationOperator)
+    bpy.utils.unregister_class(SkulImportOperator)

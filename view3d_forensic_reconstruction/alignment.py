@@ -73,7 +73,7 @@ def natural_orientation(ob, verts, width, height):
     matrix_world = ob.matrix_world
     v = []
     for vert in verts:
-        v.append((matrix_world * vert.co))
+        v.append((matrix_world * vert))
 
     origin, horizontal, vertical = sort_vertices(v[0], v[1], v[2], width, height)
 
