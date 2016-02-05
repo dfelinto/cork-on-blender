@@ -84,7 +84,7 @@ def natural_orientation(ob, verts, width, height):
 
     # rotate the object
     x = (horizontal - origin).normalized()
-    y = (vertical - origin).normalized()
+    y = -(vertical - origin).normalized()
 
     matrix = Matrix().to_3x3()
     matrix[2] = y
