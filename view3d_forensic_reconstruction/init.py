@@ -3,6 +3,7 @@ from bpy.props import (
         BoolProperty,
         EnumProperty,
         FloatProperty,
+        IntProperty,
         StringProperty,
         )
 
@@ -15,6 +16,8 @@ from bpy_extras.io_utils import (
         ImportHelper,
         )
 
+import bmesh
+
 from .exceptions import *
 
 from .lib import (
@@ -22,12 +25,16 @@ from .lib import (
         validate_executable,
         )
 
-from .cork import (
-        slice_out,
-        )
-
 from .skull import (
         skull_import,
+        )
+
+from .alignment import (
+        natural_orientation,
+        )
+
+from .cork import (
+        slice_out,
         )
 
 
@@ -47,6 +54,20 @@ class AcquireDataPanel(Panel):
 
         col = layout.column()
         col.operator("view3d.skull_import", icon="FILE_FOLDER")
+
+
+class NaturalOrientationPanel(Panel):
+    bl_label = "Natural Orientation"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'TOOLS'
+    bl_category = 'Forensic Reconstruction'
+
+    @staticmethod
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        col.operator("view3d.natural_orientation")
 
 
 class CorkMeshSlicerPanel(Panel):
@@ -120,6 +141,83 @@ class SkullImportOperator(Operator, ImportHelper):
             return {'CANCELLED'}
 
         return {'FINISHED'}
+
+
+class NaturalOrientationOperator(Operator):
+    """"""
+    bl_idname = "view3d.natural_orientation"
+    bl_label = "Natural Orientation"
+    bl_description = ""
+
+    width = FloatProperty(
+            name="Width",
+            subtype='DISTANCE',
+            description="",
+            default=0.30,
+            min=0.0,
+            max=1.0,
+            )
+
+    height = FloatProperty(
+            name="Height",
+            subtype='DISTANCE',
+            description="",
+            default=0.50,
+            min=0.0,
+            max=1.0,
+            )
+
+    @classmethod
+    def poll(cls, context):
+        if (context.mode == 'EDIT_MESH'):
+            ob = context.active_object
+            return ob and \
+                   ob.select and \
+                   ob.type == 'MESH'
+        else:
+            return False
+
+    def exec(self, context):
+        try:
+            error_scale,  \
+            error_angle = \
+                    natural_orientation(
+                    context.active_object,
+                    self._selected_verts,
+                    self.width,
+                    self.height,
+                    )
+
+        except Exception as e:
+            self.report({'ERROR'}, str(e))
+            return {'CANCELLED'}
+
+        self.report({'INFO'}, "Precision difference: {0:.2f} (distance), {1:.2f} (angle)".format(error_scale, error_angle))
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        mesh = context.active_object.data
+        bm = bmesh.from_edit_mesh(mesh)
+        selected_verts = [v for v in bm.verts if v.select]
+
+        _len = len(selected_verts)
+
+        if _len != 3:
+            self.report({'ERROR'}, "Natural Orientation requires 3 selected vertices ({0} selected)".format(_len))
+            return {'CANCELLED'}
+
+        self._selected_verts = selected_verts
+        return self.exec(context) # TODO
+
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self, width=150)
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+
+        col.prop(self, "width")
+        col.prop(self, "height")
 
 
 class CorkMeshSlicerOperator(Operator):
@@ -203,7 +301,6 @@ class CorkMeshSlicerOperator(Operator):
             if obj.type != 'MESH':
                 raise NonMeshSelectedException(obj)
 
-
     def help_draw(self, _self, context):
         layout = _self.layout
         col = layout.column()
@@ -240,17 +337,21 @@ class CorkMeshSlicerOperator(Operator):
 def register():
     # the order here determines the UI order
     bpy.utils.register_class(AcquireDataPanel)
+    bpy.utils.register_class(NaturalOrientationPanel)
     bpy.utils.register_class(CorkMeshSlicerPanel)
 
-    bpy.utils.register_class(CorkMeshSlicerOperator)
     bpy.utils.register_class(SkullImportOperator)
+    bpy.utils.register_class(NaturalOrientationOperator)
+    bpy.utils.register_class(CorkMeshSlicerOperator)
 
 
 def unregister():
     bpy.utils.unregister_class(AcquireDataPanel)
+    bpy.utils.unregister_class(NaturalOrientationPanel)
     bpy.utils.unregister_class(CorkMeshSlicerPanel)
 
     bpy.utils.unregister_class(SkulImportOperator)
+    bpy.utils.unregister_class(NaturalOrientationOperator)
     bpy.utils.unregister_class(CorkMeshSlicerOperator)
 
 
