@@ -12,6 +12,15 @@ class InvalidPathException(Exception):
         return "Invalid path: \"{0}\".".format(self._filepath)
 
 
+class InvalidTemporaryDir(Exception):
+    def __init__(self, exception):
+        Exception.__init__(self)
+        self._exception = exception
+    def __str__(self):
+        print(self._exception)
+        return "Failed to create temporary folder"
+
+
 class NonExecutableException(Exception):
     def __init__(self, filepath):
         Exception.__init__(self)

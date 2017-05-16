@@ -26,14 +26,22 @@ def delete_triangulate_modifier(ob, modifier):
 
 
 def slice_out(context, cork, method, base, plane):
+    import os
     import subprocess
+    import tempfile
+    import shutil
+
+    try:
+        dirpath = tempfile.mkdtemp()
+    except Exception as E:
+        raise InvalidTemporaryDir(E)
 
     scene = context.scene
     active = scene.objects.active
 
-    filepath_base = '/tmp/base.off'
-    filepath_plane = '/tmp/plane.off'
-    filepath_result = '/tmp/result.off'
+    filepath_base = os.path.join(dirpath, 'base.off')
+    filepath_plane = os.path.join(dirpath, 'plane.off')
+    filepath_result = os.path.join(dirpath, 'result.off')
 
     try:
         bpy.ops.import_mesh.off.poll()
@@ -86,3 +94,7 @@ def slice_out(context, cork, method, base, plane):
 
     # restore previous status
     scene.objects.active = active
+
+    # cleanup temporary folder
+    shutil.rmtree(dirpath)
+
