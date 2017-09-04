@@ -18,12 +18,12 @@
 
 # <pep8 compliant>
 bl_info = {
-    "name": "Forensic Facial Reconstruction",
-    "author": "Dalai Felinto and Cícero Moraes",
-    "version": (1, 1),
+    "name": "Cork on Blender",
+    "author": "Dalai Felinto, Cicero Moraes and Everton da Rosa",
+    "version": (1, 0),
     "blender": (2, 7, 6),
     "location": "Tool Shelf",
-    "description": "",
+    "description": "Interface to use Cork library for advanced boolean operations",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
