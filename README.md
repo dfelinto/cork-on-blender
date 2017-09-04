@@ -51,6 +51,6 @@ Installation
 
 Credits
 -------
-* [Dalai Felinto](www.dalaifelinto.com)
-* [Cicero Moraes](www.ciceromoraes.com.br)
-* [Everton da Rosa, PhD](www.3dcienciasaude.com.br)
+* [Dalai Felinto](http://www.dalaifelinto.com)
+* [Cicero Moraes](http://www.ciceromoraes.com.br)
+* [Everton da Rosa, PhD](http://www.3dcienciasaude.com.br)
