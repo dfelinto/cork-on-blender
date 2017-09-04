@@ -25,14 +25,6 @@ from .lib import (
         validate_executable,
         )
 
-from .skull import (
-        skull_import,
-        )
-
-from .alignment import (
-        natural_orientation,
-        )
-
 from .cork import (
         slice_out,
         )
@@ -42,39 +34,11 @@ from .cork import (
 # User Interface
 # ############################################################
 
-class AcquireDataPanel(Panel):
-    bl_label = "Acquire Data"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
-    bl_category = 'Forensic Reconstruction'
-
-    @staticmethod
-    def draw(self, context):
-        layout = self.layout
-
-        col = layout.column()
-        col.operator("view3d.skull_import", icon="FILE_FOLDER")
-
-
-class NaturalOrientationPanel(Panel):
-    bl_label = "Natural Orientation"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
-    bl_category = 'Forensic Reconstruction'
-
-    @staticmethod
-    def draw(self, context):
-        layout = self.layout
-
-        col = layout.column()
-        col.operator("view3d.natural_orientation", icon="MANIPUL")
-
-
 class CorkMeshSlicerPanel(Panel):
     bl_label = "Cork Mesh Slice"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    bl_category = 'Forensic Reconstruction'
+    bl_category = 'Boolean'
 
     @staticmethod
     def draw(self, context):
@@ -93,130 +57,6 @@ class CorkMeshSlicerPanel(Panel):
 # ############################################################
 # Operators
 # ############################################################
-
-class SkullImportOperator(Operator, ImportHelper):
-    """"""
-    bl_idname = "view3d.skull_import"
-    bl_label = "Skull Importer"
-    bl_description = ""
-
-    filename_ext = ".stl"
-
-    filter_glob = StringProperty(
-        default="*.stl",
-        options={'HIDDEN'},
-        )
-
-    decimate_factor = FloatProperty(
-            name="Decimator Factor",
-            default=0.35,
-            min=0.0,
-            max=1.0,
-            description="Simplify the mesh by this factor (1.0 = original mesh)",
-            options={'SKIP_SAVE'},
-            )
-
-    apply_modifier = BoolProperty(
-            name="Apply Decimate Modifier",
-            default=True,
-            description="",
-            options={'SKIP_SAVE'},
-            )
-
-    @classmethod
-    def poll(cls, context):
-        return True
-
-    def execute(self, context):
-        try:
-            skull_import(
-                    context,
-                    self.properties.filepath,
-                    self.decimate_factor,
-                    self.apply_modifier,
-                    )
-
-        except Exception as e:
-            self.report({'ERROR'}, str(e))
-            return {'CANCELLED'}
-
-        return {'FINISHED'}
-
-
-class NaturalOrientationOperator(Operator):
-    """"""
-    bl_idname = "view3d.natural_orientation"
-    bl_label = "Natural Orientation"
-    bl_description = ""
-    bl_options = {'REGISTER', 'UNDO'}
-
-    width = FloatProperty(
-            name="Width",
-            subtype='DISTANCE',
-            description="",
-            default=0.30,
-            min=0.001,
-            )
-
-    height = FloatProperty(
-            name="Height",
-            subtype='DISTANCE',
-            description="",
-            default=0.50,
-            min=0.001,
-            )
-
-    @classmethod
-    def poll(cls, context):
-        if (context.mode == 'EDIT_MESH'):
-            ob = context.active_object
-            return ob and \
-                   ob.select and \
-                   ob.type == 'MESH'
-        else:
-            return False
-
-    def execute(self, context):
-        try:
-            error_scale,  \
-            error_angle = \
-                    natural_orientation(
-                    context.active_object,
-                    self._selected_verts,
-                    self.width,
-                    self.height,
-                    )
-
-        except Exception as e:
-            self.report({'ERROR'}, str(e))
-            return {'CANCELLED'}
-
-        self.report({'INFO'}, "Precision difference: {0:.2f} (distance), {1:.2f} (angle)".format(error_scale, error_angle))
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        mesh = context.active_object.data
-        bm = bmesh.from_edit_mesh(mesh)
-        selected_verts = [v.co for v in bm.verts if v.select]
-
-        _len = len(selected_verts)
-
-        if _len != 3:
-            self.report({'ERROR'}, "Natural Orientation requires 3 selected vertices ({0} selected)".format(_len))
-            return {'CANCELLED'}
-
-        self._selected_verts = selected_verts
-
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=150)
-
-    def draw(self, context):
-        layout = self.layout
-        col = layout.column()
-
-        col.prop(self, "width")
-        col.prop(self, "height")
-
 
 class CorkMeshSlicerOperator(Operator):
     """"""
@@ -334,20 +174,11 @@ class CorkMeshSlicerOperator(Operator):
 
 def register():
     # the order here determines the UI order
-    bpy.utils.register_class(SkullImportOperator)
-    bpy.utils.register_class(NaturalOrientationOperator)
     bpy.utils.register_class(CorkMeshSlicerOperator)
-
-    bpy.utils.register_class(AcquireDataPanel)
-    bpy.utils.register_class(NaturalOrientationPanel)
     bpy.utils.register_class(CorkMeshSlicerPanel)
 
 
 def unregister():
     bpy.utils.unregister_class(CorkMeshSlicerPanel)
-    bpy.utils.unregister_class(NaturalOrientationPanel)
-    bpy.utils.unregister_class(AcquireDataPanel)
-
     bpy.utils.unregister_class(CorkMeshSlicerOperator)
-    bpy.utils.unregister_class(NaturalOrientationOperator)
-    bpy.utils.unregister_class(SkulImportOperator)
+
