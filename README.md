@@ -27,7 +27,7 @@ Those are a few projects were `Cork on Blender` was tested before its public rel
 Requirements
 ------------
 * [Cork](https://github.com/gilbo/cork) stand-alone - *If you can't build it yourself, download pre-compiled versions for
-[Windows](http://www.dalaifelinto.com/ftp/cork/windows/cork.exe),
+[Windows](http://www.dalaifelinto.com/ftp/cork/windows/wincork.exe),
 [MacOSX](http://www.dalaifelinto.com/ftp/cork/mac/cork) and
 [Linux](http://www.dalaifelinto.com/ftp/cork/linux/cork).*
 
