@@ -19,6 +19,6 @@ def validate_executable(filepath):
         raise InvalidPathException(filepath)
 
     if not os.access(filepath, os.X_OK):
-        raise NonExecutableException(Exception)
+        raise NonExecutableException(filepath)
 
     return True
