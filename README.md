@@ -47,7 +47,7 @@ Installation
 
 * Expand the addon tab, and at the `Cork Executable` pick your installation of the cork stand-alone, and click on `Accept`. 
 
-* Finally, click on `Install from File`.
+* Finally, save your user preferences, and look at the new panel in the viewport.
 
 Credits
 -------
